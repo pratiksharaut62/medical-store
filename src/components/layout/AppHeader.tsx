@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -8,6 +9,8 @@ import {
   BarChart3,
   Bell,
   Plus,
+  Menu,
+  X,
 } from "lucide-react";
 import { NavItem } from "./NavItem";
 import { MoreMenu, MoreMenuItem } from "./MoreMenu";
@@ -35,7 +38,6 @@ const PRIMARY_NAV: { key: NavKey; label: string; icon: JSX.Element; href: string
   { key: "reports", label: "Reports", icon: <BarChart3 size={17} />, href: "/reports" },
 ];
 
-// Section 7: everything that isn't a top-6 daily-use module.
 const MORE_ITEMS: MoreMenuItem[] = [
   { label: "Prescriptions", href: "/prescriptions" },
   { label: "Expiry & Returns", href: "/expiry-returns" },
@@ -51,20 +53,34 @@ export function AppHeader({
   userName,
   userRole,
 }: AppHeaderProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
+  const handleMobileNav = (href: string) => {
+    navigate(href);
+    setIsMobileMenuOpen(false);
+  };
+
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-header px-6">
-      {/* Left: logo */}
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-header px-4 sm:px-6">
+      {/* Left: Mobile Toggle + Logo */}
       <div className="flex shrink-0 items-center gap-2.5">
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="lg:hidden text-header-text p-1 hover:bg-header-secondary rounded-md focus:outline-none"
+          aria-label="Toggle navigation menu"
+        >
+          {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+
         <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-white">
           <Plus size={18} strokeWidth={2.5} />
         </div>
         <span className="text-body font-semibold text-header-text">Medical Store ERP</span>
       </div>
 
-      {/* Center: primary nav */}
+      {/* Center: Desktop Navigation */}
       <nav className="hidden items-center gap-1 lg:flex">
         {PRIMARY_NAV.map((item) => {
           const isActive =
@@ -82,8 +98,8 @@ export function AppHeader({
         <MoreMenu items={MORE_ITEMS} />
       </nav>
 
-      {/* Right: notifications + user */}
-      <div className="flex shrink-0 items-center gap-4">
+      {/* Right: Notifications + User profile */}
+      <div className="flex shrink-0 items-center gap-3 sm:gap-4">
         <button
           aria-label={`Notifications${notificationCount ? `, ${notificationCount} unread` : ""}`}
           className="relative flex h-9 w-9 items-center justify-center rounded-full text-header-muted hover:bg-header-secondary hover:text-header-text"
@@ -96,7 +112,7 @@ export function AppHeader({
           )}
         </button>
 
-        <div className="flex items-center gap-2.5 border-l border-header-secondary pl-4">
+        <div className="flex items-center gap-2.5 border-l border-header-secondary pl-3 sm:pl-4">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-caption font-semibold text-white">
             {userName
               .split(" ")
@@ -110,6 +126,56 @@ export function AppHeader({
           </div>
         </div>
       </div>
+
+      {/* Mobile Navigation Drawer Dropdown */}
+      {isMobileMenuOpen && (
+        <div className="absolute left-0 top-16 w-full max-h-[calc(100vh-4rem)] overflow-y-auto bg-header border-b border-header-secondary p-4 shadow-xl lg:hidden flex flex-col gap-1">
+          <p className="px-3 text-xs text-header-muted font-semibold uppercase tracking-wider mb-1">
+            Main Navigation
+          </p>
+          {PRIMARY_NAV.map((item) => {
+            const isActive =
+              item.href === "/" ? location.pathname === "/" : location.pathname.startsWith(item.href);
+
+            return (
+              <button
+                key={item.key}
+                onClick={() => handleMobileNav(item.href)}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-left text-sm font-medium transition-colors ${
+                  isActive
+                    ? "bg-primary text-white font-semibold"
+                    : "text-header-text hover:bg-header-secondary"
+                }`}
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+
+          <div className="border-t border-header-secondary pt-3 mt-2">
+            <p className="px-3 text-xs text-header-muted font-semibold uppercase tracking-wider mb-1">
+              More Modules
+            </p>
+            {MORE_ITEMS.map((item) => {
+              const isActive = location.pathname.startsWith(item.href);
+              return (
+                <button
+                  key={item.href}
+                  onClick={() => handleMobileNav(item.href)}
+                  className={`w-full text-left px-3 py-2 text-sm rounded-md transition-colors ${
+                    isActive
+                      ? "bg-primary text-white font-semibold"
+                      : "text-header-text hover:bg-header-secondary"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </header>
   );
 }
