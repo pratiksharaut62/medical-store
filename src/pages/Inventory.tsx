@@ -10,7 +10,7 @@ import { InventoryQuickActionsPanel } from "@/components/inventory/InventoryQuic
 import { StockAgeingPanel } from "@/components/inventory/StockAgeingPanel";
 import { mockCategoryOptions, mockSupplierOptions } from "@/data/mockInventoryData";
 import { Button } from "@/components/ui/Button";
-import { ImportStockModal } from "@/components/inventory/ImportStockModal";
+
 
 /**
  *  "Find stock, understand stock state, take stock action."
