@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    @apply bg-bg text-text-primary font-sans antialiased;
+    font-feature-settings: "tnum" 1; /* tabular numbers for tables/KPIs */
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  :focus-visible {
+    outline: 2px solid #1677ff;
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  /* Indian numbering helpers are formatted in JS (see lib/format.ts) —
+     this class just fixes width jitter on live-updating numbers */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
