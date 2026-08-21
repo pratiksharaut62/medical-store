@@ -21,6 +21,7 @@ export type NavKey =
   | "inventory"
   | "purchases"
   | "customers"
+  | "accounts"
   | "reports";
 
 interface AppHeaderProps {
@@ -35,17 +36,16 @@ const PRIMARY_NAV: { key: NavKey; label: string; icon: JSX.Element; href: string
   { key: "inventory", label: "Inventory", icon: <Boxes size={17} />, href: "/inventory" },
   { key: "purchases", label: "Purchases", icon: <ShoppingBag size={17} />, href: "/purchases" },
   { key: "customers", label: "Customers", icon: <Users size={17} />, href: "/customers" },
-  { key: "reports", label: "Reports", icon: <BarChart3 size={17} />, href: "/reports" },
+  { key: "accounts", label: "Accounts", icon: <Users size={17} />, href: "/accounts" },
+  { key: "reports", label: "Reports", icon: <BarChart3 size={15} />, href: "/reports" },
 ];
 
 const MORE_ITEMS: MoreMenuItem[] = [
-  { label: "Prescriptions", href: "/prescriptions" },
   { label: "Expiry & Returns", href: "/expiry-returns" },
-  { label: "Accounts", href: "/accounts" },
   { label: "GST & Tax", href: "/gst" },
   { label: "Compliance", href: "/compliance" },
-  { label: "CRM & Loyalty", href: "/crm" },
   { label: "Settings", href: "/settings" },
+  { label: "Prescriptions", href: "/prescriptions" },
 ];
 
 export function AppHeader({

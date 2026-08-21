@@ -24,7 +24,7 @@ const sizeClasses: Record<Size, string> = {
 };
 
 /**
- * Section 24: only one primary (filled) button per section. Prefer
+ *  only one primary (filled) button per section. Prefer
  * `secondary` or `tertiary` for every other action on a screen.
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(

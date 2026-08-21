@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { History } from "lucide-react";
 import { useBillingSession } from "@/hooks/useBillingSession";
 import { SearchBar } from "@/components/billing/SearchBar";
@@ -7,35 +8,45 @@ import { CurrentBillPanel } from "@/components/billing/CurrentBillPanel";
 import { CustomerPaymentBar } from "@/components/billing/CustomerPaymentBar";
 import { QuickShortcutsBar } from "@/components/billing/QuickShortcutsBar";
 
-/**
- * Section 10: keyboard-first POS. Left = Find (search, categories,
- * frequently sold). Right = Review + Pay (current bill, customer,
- * payment). Clicking a product tile is the mouse-equivalent of
- * scan-and-add; every quantity/discount control stays reachable
- * without leaving the current screen.
- */
+function getTodayDateString(): string {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export default function Billing() {
   const session = useBillingSession();
 
+  // Dynamically replace the date portion inside POS-YYYY-MM-DD-XXXX
+  const dynamicBillNo = useMemo(() => {
+    if (!session.meta?.billNo) return "";
+    
+    // Extracts the sequence number at the end (e.g. "0015")
+    const parts = session.meta.billNo.split("-");
+    const sequence = parts[parts.length - 1] || "0015";
+    
+    return `POS-${getTodayDateString()}-${sequence}`;
+  }, [session.meta?.billNo]);
+
   function handlePay() {
-    // Swap for a real `POST /api/bills` call once a backend exists —
-    // the whole cart/customer/payment state above already matches
-    // what that request would need.
     window.alert(`Charged ${session.customerId} via ${session.paymentMethod}.`);
   }
 
   return (
-    <div className="mx-auto max-w-[1440px] px-6 py-6">
+    <div className="mx-auto max-w-[1440px] px-4 py-6 sm:px-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <h1 className="text-page-title text-text-primary">Billing (POS)</h1>
+          <h1 className="text-page-title font-bold text-text-primary">Billing (POS)</h1>
           <span className="text-body text-text-secondary">{session.meta.counterLabel}</span>
           <span className="flex items-center gap-1.5 text-caption font-medium text-success">
             <span className="h-1.5 w-1.5 rounded-full bg-success" />
             Online
           </span>
         </div>
-        <button className="flex items-center gap-2 rounded-sm border border-border bg-surface px-3 py-2 text-caption font-medium text-text-primary">
+
+        <button className="flex items-center gap-2 rounded-sm border border-border bg-surface px-3 py-2 text-caption font-medium text-text-primary hover:bg-surface-hover">
           <History size={15} />
           Recent Bills
         </button>
@@ -54,9 +65,9 @@ export default function Billing() {
         </div>
 
         {/* Right: Review + Pay */}
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <CurrentBillPanel
-            billNo={session.meta.billNo}
+            billNo={dynamicBillNo}
             lines={session.lines}
             onQtyChange={session.updateQty}
             onRemove={session.removeLine}
@@ -67,6 +78,7 @@ export default function Billing() {
             note={session.note}
             onNoteChange={session.setNote}
           />
+
           <CustomerPaymentBar
             customers={session.customers}
             customerId={session.customerId}
@@ -80,7 +92,9 @@ export default function Billing() {
         </div>
       </div>
 
-      <QuickShortcutsBar isOnline={session.meta.isOnline} lastSyncLabel={session.meta.lastSyncLabel} />
+      <div className="mt-6">
+        <QuickShortcutsBar isOnline={session.meta.isOnline} lastSyncLabel={session.meta.lastSyncLabel} />
+      </div>
     </div>
   );
 }
