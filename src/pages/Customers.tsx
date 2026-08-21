@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Upload, Plus, Search, Calendar } from "lucide-react";
 import { useCustomersData } from "@/hooks/useCustomersData";
 import { CustomersKpiRow } from "@/components/customers/CustomersKpiRow";
